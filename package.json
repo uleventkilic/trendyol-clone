@@ -4,6 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
+    "install": "npm install sqlite3 --build-from-source"
   },
   "dependencies": {
     "sqlite3": "^5.1.7",
