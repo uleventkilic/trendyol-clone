@@ -31,11 +31,11 @@ app.get('/', (req, res) => {
 
 // Search Page
 app.get('/search', (req, res) => {
-  const keyword = req.query.q || ''; // Arama terimi
+  const keyword = req.query.q || ''; // Search keyword
   const categoryQuery = `SELECT category, COUNT(*) as product_count FROM products GROUP BY category`;
   const productQuery = `
     SELECT * FROM products 
-    WHERE name LIKE ? OR description LIKE ? OR category LIKE ? OR CAST(product_no AS TEXT) LIKE ?`; // product_no'yu metne çevirerek arama yapılır
+    WHERE name LIKE ? OR description LIKE ? OR category LIKE ? OR CAST(product_no AS TEXT) LIKE ?`; // Casting product_no for search
 
   try {
     const categories = db.prepare(categoryQuery).all();
