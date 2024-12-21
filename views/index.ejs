@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trendyol Clone Homepage</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    // JavaScript for toggling the hamburger menu
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const categoryList = document.querySelector('.category-list');
+
+      menuToggle.addEventListener('click', () => {
+        categoryList.classList.toggle('active');
+      });
+    });
+  </script>
+  <style>
+    /* Special styling for the logo */
+    .logo a {
+      text-decoration: none; /* Remove underline */
+      color: #fff; /* White text color */
+    }
+
+    .logo a:hover {
+      color: #ddd; /* Lighter color on hover */
+    }
+
+    /* Mobile responsiveness for hamburger menu */
+    .categories {
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .categories .menu-toggle {
+      display: none; /* Hidden on desktop */
+      background-color: #ff6f00;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .categories .category-list {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .categories a {
+      text-decoration: none;
+      color: #333;
+      padding: 10px 15px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .categories a:hover {
+      color: #ff6f00;
+    }
+
+    @media (max-width: 768px) {
+      .categories .menu-toggle {
+        display: block; /* Show on mobile */
+        width: 100%; /* Full-width button */
+        text-align: center;
+      }
+
+      .categories .category-list {
+        display: none; /* Hidden by default */
+        flex-direction: column; /* Display as a list */
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .categories .category-list.active {
+        display: flex; /* Show when menu is toggled */
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Menu -->
+  <header>
+    <div class="logo">
+      <a href="/"><h1>Trendyol Clone</h1></a>
+    </div>
+    <div class="search-bar">
+      <form action="/search" method="GET">
+        <input type="text" name="q" placeholder="Search for product, category, or brand..." />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Menu and Categories -->
+  <nav class="categories">
+    <button class="menu-toggle">☰ Menu</button>
+    <div class="category-list">
+      <% categories.forEach(category => { %>
+        <a href="/search?q=<%= category.category %>">
+          <%= category.category %> (<%= category.product_count %> products)
+        </a>
+      <% }); %>
+    </div>
+  </nav>
+
+  <!-- Product List -->
+  <main>
+    <h2>Featured Products</h2>
+    <div class="product-grid">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+          <a href="/detail/<%= product.id %>">
+            <img src="<%= product.image %>" alt="<%= product.name %>" />
+            <div class="product-info">
+              <p class="product-name"><%= product.name %></p>
+              <p class="product-price"><%= product.price %>₺</p>
+              <p>Product No: <%= product.product_no %></p>
+            </div>
+          </a>
+        </div>
+      <% }); %>
+    </div>
+  </main>
+</body>
+</html>

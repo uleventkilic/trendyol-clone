@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= product.name %> - Product Detail</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script>
+    // JavaScript for toggling the hamburger menu
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const categoryList = document.querySelector('.category-list');
+
+      menuToggle.addEventListener('click', () => {
+        categoryList.classList.toggle('active');
+      });
+    });
+  </script>
+  <style>
+    /* Special styling for the logo */
+    .logo a {
+      text-decoration: none; /* Remove underline */
+      color: #fff; /* White text color */
+    }
+
+    .logo a:hover {
+      color: #ddd; /* Lighter color on hover */
+    }
+
+    /* Mobile responsiveness for hamburger menu */
+    .categories {
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .categories .menu-toggle {
+      display: none; /* Hidden on desktop */
+      background-color: #ff6f00;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .categories .category-list {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .categories a {
+      text-decoration: none;
+      color: #333;
+      padding: 10px 15px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .categories a:hover {
+      color: #ff6f00;
+    }
+
+    @media (max-width: 768px) {
+      .categories .menu-toggle {
+        display: block; /* Show on mobile */
+        width: 100%; /* Full-width button */
+        text-align: center;
+      }
+
+      .categories .category-list {
+        display: none; /* Hidden by default */
+        flex-direction: column; /* Display as a list */
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .categories .category-list.active {
+        display: flex; /* Show when menu is toggled */
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <a href="/"><h1>Trendyol Clone</h1></a>
+    </div>
+    <div class="search-bar">
+      <form action="/search" method="GET">
+        <input type="text" name="q" placeholder="Search for product, category, or brand..." />
+        <button type="submit">Search</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Menu and Categories -->
+  <nav class="categories">
+    <button class="menu-toggle">☰ Menu</button>
+    <div class="category-list">
+      <% categories.forEach(category => { %>
+        <a href="/search?q=<%= category.category %>">
+          <%= category.category %> (<%= category.product_count %> products)
+        </a>
+      <% }); %>
+    </div>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <nav>
+    <ol class="breadcrumb">
+      <% breadcrumbs.forEach((crumb, index) => { %>
+        <li>
+          <% if (index === breadcrumbs.length - 1) { %>
+            <span><%= crumb.name %></span>
+          <% } else { %>
+            <a href="<%= crumb.url %>"><%= crumb.name %></a>
+          <% } %>
+        </li>
+      <% }); %>
+    </ol>
+  </nav>
+
+  <!-- Product Detail -->
+  <main class="product-detail-container">
+    <div class="product-detail-left">
+      <img src="<%= product.image %>" alt="<%= product.name %>" />
+    </div>
+    <div class="product-detail-right">
+      <h1 class="product-title"><%= product.name %></h1>
+      <p class="product-rating">
+        ⭐ 4.4 • 92855 Reviews • 📷 1614 Q&A • ❤️ 1.4M Favorites
+      </p>
+      <p class="product-price"><%= product.price %> TL</p>
+      <button class="buy-now">Buy Now</button>
+      <p class="product-description"><%= product.description %></p>
+      <p>Product No: <%= product.product_no %></p>
+    </div>
+  </main>
+</body>
+</html>
