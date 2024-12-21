@@ -16,9 +16,6 @@
   "devDependencies": {
     "nodemon": "^3.1.7"
   },
-  "engines": {
-    "node": "18.x"
-  },
   "author": "",
   "license": "ISC",
   "description": ""
