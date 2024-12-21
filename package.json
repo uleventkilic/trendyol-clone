@@ -6,6 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "sqlite3": "^5.1.7",
     "better-sqlite3": "^11.7.0",
     "body-parser": "^1.20.3",
     "ejs": "^3.1.10",
