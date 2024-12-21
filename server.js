@@ -1,7 +1,7 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const bodyParser = require('body-parser');
 const path = require('path');
+const bodyParser = require('body-parser');
+const Database = require('better-sqlite3');
 
 const app = express();
 const port = 3000;
@@ -11,32 +11,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-// Database setup
-const db = new sqlite3.Database('./database/database.db', (err) => {
-  if (err) console.error('Database error:', err.message);
-  else console.log('Database connected successfully.');
-});
+// Database setup (using better-sqlite3)
+const db = new Database('./database/database.db', { verbose: console.log });
 
 // Homepage - Product Count by Category and Featured Products
 app.get('/', (req, res) => {
   const categoryQuery = `SELECT category, COUNT(*) as product_count FROM products GROUP BY category`;
   const productQuery = `SELECT * FROM products LIMIT 20`;
 
-  db.all(categoryQuery, [], (err, categories) => {
-    if (err) {
-      console.error('Category query error:', err.message);
-      return res.status(500).send('Server error');
-    }
-
-    db.all(productQuery, [], (err, products) => {
-      if (err) {
-        console.error('Product query error:', err.message);
-        return res.status(500).send('Server error');
-      }
-
-      res.render('index', { categories, products });
-    });
-  });
+  try {
+    const categories = db.prepare(categoryQuery).all();
+    const products = db.prepare(productQuery).all();
+    res.render('index', { categories, products });
+  } catch (err) {
+    console.error('Database query error:', err.message);
+    res.status(500).send('Server error');
+  }
 });
 
 // Search Page
@@ -47,25 +37,14 @@ app.get('/search', (req, res) => {
     SELECT * FROM products 
     WHERE name LIKE ? OR description LIKE ? OR category LIKE ? OR CAST(product_no AS TEXT) LIKE ?`; // product_no'yu metne çevirerek arama yapılır
 
-  db.all(categoryQuery, [], (err, categories) => {
-    if (err) {
-      console.error('Category query error:', err.message);
-      return res.status(500).send('Server error');
-    }
-
-    db.all(
-      productQuery,
-      [`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`],
-      (err, products) => {
-        if (err) {
-          console.error('Product query error:', err.message);
-          return res.status(500).send('Server error');
-        }
-
-        res.render('search', { products, categories, keyword });
-      }
-    );
-  });
+  try {
+    const categories = db.prepare(categoryQuery).all();
+    const products = db.prepare(productQuery).all(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    res.render('search', { products, categories, keyword });
+  } catch (err) {
+    console.error('Database query error:', err.message);
+    res.status(500).send('Server error');
+  }
 });
 
 // Detail Page (with Breadcrumbs)
@@ -74,30 +53,25 @@ app.get('/detail/:id', (req, res) => {
   const productQuery = `SELECT * FROM products WHERE id = ?`;
   const categoryQuery = `SELECT category, COUNT(*) as product_count FROM products GROUP BY category`;
 
-  db.all(categoryQuery, [], (err, categories) => {
-    if (err) {
-      console.error('Category query error:', err.message);
-      return res.status(500).send('Server error');
+  try {
+    const categories = db.prepare(categoryQuery).all();
+    const product = db.prepare(productQuery).get(productId);
+
+    if (!product) {
+      return res.status(404).send('Product not found');
     }
 
-    db.get(productQuery, [productId], (err, product) => {
-      if (err) {
-        console.error('Product query error:', err.message);
-        return res.status(500).send('Server error');
-      }
-      if (!product) {
-        return res.status(404).send('Product not found');
-      }
+    const breadcrumbs = [
+      { name: "Homepage", url: "/" },
+      { name: product.category, url: `/search?q=${product.category}` },
+      { name: product.name, url: `/detail/${product.id}` }
+    ];
 
-      const breadcrumbs = [
-        { name: "Homepage", url: "/" },
-        { name: product.category, url: `/search?q=${product.category}` },
-        { name: product.name, url: `/detail/${product.id}` }
-      ];
-
-      res.render('detail', { product, breadcrumbs, categories });
-    });
-  });
+    res.render('detail', { product, breadcrumbs, categories });
+  } catch (err) {
+    console.error('Database query error:', err.message);
+    res.status(500).send('Server error');
+  }
 });
 
 // Start Server
